@@ -1,0 +1,150 @@
+!DOCTYPE html> 
+<html lang="fr"> 
+<head> 
+     <meta charset="UTF-8"> 
+    <title>Analyseur de Sentiment IA</title> 
+    <style> 
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 700px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        } 
+        .container { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+        } 
+        h1 { 
+            text-align: center; 
+            color: #667eea; 
+        } 
+        textarea { 
+            width: 100%; 
+            min-height: 150px; 
+            padding: 15px; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            resize: vertical; 
+            box-sizing: border-box; 
+        } 
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 15px; 
+        } 
+        button:hover { 
+            transform: scale(1.02); 
+        } 
+  #result { 
+            margin-top: 30px; 
+            padding: 25px; 
+            border-radius: 10px; 
+            display: none; 
+            text-align: center; 
+        } 
+        .emoji { 
+            font-size: 80px; 
+        } 
+        .stars { 
+            font-size: 40px; 
+            color: #ffd700; 
+        } 
+        .loading { 
+            text-align: center; 
+            color: #667eea; 
+            display: none; 
+            margin-top: 20px; 
+        } 
+    </style> 
+</head> 
+<body> 
+    <div class="container"> 
+        <h1> Analyseur de Sentiment IA</h1> 
+        <p style="text-align: center; color: #666;"> 
+            Entrez un texte et l'IA analysera son sentiment 
+        </p> 
+         
+        <textarea id="textInput" placeholder="Écrivez votre texte ici... 
+Par exemple : 'Ce film était absolument incroyable, j'ai adoré !'"></textarea> 
+         
+        <button onclick="analyzeSentiment()">🔍 Analyser le sentiment</button> 
+         
+        <div class="loading"> Analyse en cours...</div> 
+         
+        <div id="result"> 
+            <div class="emoji" id="emoji"></div> 
+            <h2 id="sentiment"></h2> 
+            <div class="stars" id="stars"></div> 
+            <p>Confiance : <strong id="confidence"></strong></p> 
+        </div> 
+    </div> 
+ 
+    <script>
+         async function analyzeSentiment() { 
+            const text = document.getElementById('textInput').value.trim(); 
+             
+            if (!text) { 
+                alert('Veuillez entrer du texte'); 
+                return; 
+            } 
+             
+            document.querySelector('.loading').style.display = 'block'; 
+            document.getElementById('result').style.display = 'none'; 
+             
+            try { 
+                const response = await fetch('/analyze', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({text: text}) 
+                }); 
+                 
+                const data = await response.json(); 
+                 
+                if (data.error) { 
+                    alert('Erreur: ' + data.error); 
+                    return; 
+                } 
+                 
+                // Afficher les résultats 
+                const result = document.getElementById('result'); 
+                result.style.backgroundColor = data.color + '20'; 
+                result.style.border = '3px solid ' + data.color; 
+                 
+                document.getElementById('emoji').textContent = data.emoji; 
+                document.getElementById('sentiment').textContent = 
+data.sentiment; 
+                document.getElementById('stars').textContent = 
+'⭐'.repeat(data.stars); 
+                document.getElementById('confidence').textContent = 
+data.confidence + '%'; 
+                 
+                result.style.display = 'block'; 
+                 
+            } catch (error) { 
+                alert('Erreur de connexion: ' + error); 
+            } finally { 
+                document.querySelector('.loading').style.display = 'none'; 
+            } 
+      } 
+         
+        // Permettre l'envoi avec Entrée 
+        document.getElementById('textInput').addEventListener('keydown', 
+function(e) { 
+            if (e.key === 'Enter' && e.ctrlKey) { 
+                analyzeSentiment(); 
+            } 
+        }); 
+    </script> 
+</body> 
+</html> 

@@ -1,0 +1,4 @@
+lask 
+transformers 
+torch 
+numpy<2 
